@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Pagos - Servicios Pullman Bus</title>
+    <!-- Themify Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Additional styles specific to payments page */
+        .payment-filters {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .filter-group input,
+        .filter-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .payment-summary {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .summary-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            flex: 1;
+            min-width: 180px;
+        }
+        
+        .summary-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        .summary-card .amount {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .payment-table th {
+            background-color: #f8f9fa;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #2c3e50;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .payment-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+        
+        .payment-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .btn-export {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+        
+        .btn-export:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="css/logo.jpg" alt="Logo Servicios Pullman Bus" class="logo-img">
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">
+                        <i class="ti-home sidemenu-icon menu-icon"></i>
+                        <span class="menu-title">Proveedores</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="payments.html" class="nav-link active">
+                        <i class="ti-wallet sidemenu-icon menu-icon"></i>
+                        <span class="menu-title">Pagos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="ti-direction-alt sidemenu-icon menu-icon"></i>
+                        <span class="menu-title">Rutas</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1>Historial de Pagos</h1>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="new-payment-btn">
+                        <i class="ti-plus"></i> Nuevo Pago
+                    </button>
+                </div>
+            </div>
+
+            <div class="content">
+                <!-- Filtros -->
+                <div class="payment-filters">
+                    <div class="filter-group">
+                        <label for="date-range">Rango de Fechas</label>
+                        <input type="month" id="date-range">
+                    </div>
+                    <div class="filter-group">
+                        <label for="provider-filter">Proveedor</label>
+                        <select id="provider-filter">
+                            <option value="">Todos los proveedores</option>
+                            <!-- Se llenará dinámicamente -->
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="status-filter">Estado</label>
+                        <select id="status-filter">
+                            <option value="">Todos los estados</option>
+                            <option value="completed">Completados</option>
+                            <option value="pending">Pendientes</option>
+                        </select>
+                    </div>
+                    <button class="btn" id="apply-filters">Aplicar Filtros</button>
+                    <button class="btn btn-secondary" id="reset-filters">Limpiar</button>
+                </div>
+
+                <!-- Resumen -->
+                <div class="payment-summary">
+                    <div class="summary-card">
+                        <h3>Total Pagado</h3>
+                        <div class="amount" id="total-paid">$0</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Pagos Realizados</h3>
+                        <div class="amount" id="payment-count">0</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Promedio por Pago</h3>
+                        <div class="amount" id="average-payment">$0</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Proveedores</h3>
+                        <div class="amount" id="providers-count">0</div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Pagos -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Registro de Pagos</h3>
+                        <button class="btn-export" id="export-pdf">
+                            <i class="ti-file"></i> Exportar a PDF
+                        </button>
+                    </div>
+                    <table class="payment-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>ID de Pago</th>
+                                <th>Proveedor</th>
+                                <th>Período</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payments-table">
+                            <tr>
+                                <td colspan="7" class="text-center">No hay pagos registrados</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/payments.js"></script>
+</body>
+</html>
