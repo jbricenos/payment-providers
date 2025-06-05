@@ -532,6 +532,7 @@ textarea.error {
     text-decoration: none;
 }
 
+
 /* Delete Confirmation Modal Specific Styles */
 #delete-confirm-modal .modal-content {
     max-width: 500px;

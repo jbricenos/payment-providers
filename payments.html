@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -7,6 +8,7 @@
     <!-- Themify Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/payments.css">
     <style>
         /* Additional styles specific to payments page */
         .payment-filters {
@@ -250,6 +252,42 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Nuevo Pago -->
+    <div id="new-payment-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Registrar Nuevo Pago</h2>
+                <button type="button" class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="new-payment-form">
+                    <div class="form-group">
+                        <label for="payment-provider">Proveedor <span class="required">*</span></label>
+                        <select id="payment-provider" class="form-control" required>
+                            <option value="">Seleccionar proveedor</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="payment-amount">Monto <span class="required">*</span></label>
+                        <input type="number" id="payment-amount" class="form-control" min="0" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="payment-concept">Concepto <span class="required">*</span></label>
+                        <input type="text" id="payment-concept" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="payment-date">Fecha de Pago <span class="required">*</span></label>
+                        <input type="date" id="payment-date" class="form-control" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-payment-btn">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Pago</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

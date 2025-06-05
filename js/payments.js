@@ -1,6 +1,7 @@
-// Datos de ejemplo para pagos (se reemplazarán con datos reales de localStorage)
+// Datos de pagos
 let payments = JSON.parse(localStorage.getItem('payments')) || [];
 let providers = JSON.parse(localStorage.getItem('providers')) || [];
+let nextPaymentId = payments.length > 0 ? Math.max(...payments.map(p => p.id)) + 1 : 1;
 
 // Elementos del DOM
 const paymentsTable = document.getElementById('payments-table');
@@ -12,12 +13,20 @@ const resetFiltersBtn = document.getElementById('reset-filters');
 const newPaymentBtn = document.getElementById('new-payment-btn');
 const exportPdfBtn = document.getElementById('export-pdf');
 
+// Elementos del modal de nuevo pago
+const newPaymentModal = document.getElementById('new-payment-modal');
+const newPaymentForm = document.getElementById('new-payment-form');
+const closeModalBtn = document.querySelector('.close-modal');
+const cancelPaymentBtn = document.getElementById('cancel-payment-btn');
+
 // Fecha actual para el filtro por defecto
 const today = new Date();
 dateRange.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
 
 // Inicialización
 function init() {
+    console.log('Inicializando aplicación de pagos...');
+    console.log('Botón newPaymentBtn en init:', newPaymentBtn);
     loadProviders();
     renderPaymentsTable();
     updateSummary();
@@ -38,7 +47,7 @@ function loadProviders() {
 
 // Renderizar la tabla de pagos
 function renderPaymentsTable(filteredPayments = null) {
-    const paymentsToRender = filteredPayments || payments;
+    const paymentsToRender = filteredPayments || [...payments].reverse(); // Mostrar los más recientes primero
     
     if (paymentsToRender.length === 0) {
         paymentsTable.innerHTML = `
@@ -132,23 +141,148 @@ function applyFilters() {
     renderPaymentsTable(filtered);
 }
 
+// Mostrar modal de nuevo pago
+function showNewPaymentModal() {
+    console.log('Mostrando modal de nuevo pago');
+    
+    // Cargar proveedores en el select
+    const providerSelect = document.getElementById('payment-provider');
+    if (providerSelect) {
+        providerSelect.innerHTML = '<option value="">Seleccionar proveedor</option>';
+        
+        const activeProviders = providers.filter(p => p.status === 'Activo');
+        console.log('Proveedores activos:', activeProviders);
+        
+        activeProviders.forEach(provider => {
+            const option = document.createElement('option');
+            option.value = provider.id;
+            option.textContent = provider.name;
+            providerSelect.appendChild(option);
+        });
+    } else {
+        console.error('No se encontró el elemento payment-provider');
+    }
+    
+    // Establecer fecha actual como valor por defecto
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('payment-date');
+    if (dateInput) {
+        dateInput.value = today;
+    } else {
+        console.error('No se encontró el elemento payment-date');
+    }
+    
+    // Mostrar el modal
+    if (newPaymentModal) {
+        newPaymentModal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        console.log('Modal mostrado correctamente');
+    } else {
+        console.error('No se pudo encontrar el modal');
+    }
+}
+
+// Cerrar modal de nuevo pago
+function closeNewPaymentModal() {
+    console.log('Cerrando modal de nuevo pago');
+    
+    if (newPaymentModal) {
+        newPaymentModal.classList.remove('show');
+        document.body.style.overflow = 'auto';
+        
+        // Esperar a que termine la animación para resetear el formulario
+        setTimeout(() => {
+            if (newPaymentForm) {
+                newPaymentForm.reset();
+            }
+        }, 300);
+        
+        console.log('Modal cerrado correctamente');
+    } else {
+        console.error('No se pudo encontrar el modal para cerrar');
+    }
+}
+
+// Manejar envío del formulario de nuevo pago
+function handleNewPaymentSubmit(e) {
+    e.preventDefault();
+    
+    const providerId = parseInt(document.getElementById('payment-provider').value);
+    const amount = parseFloat(document.getElementById('payment-amount').value);
+    const concept = document.getElementById('payment-concept').value.trim();
+    const paymentDate = document.getElementById('payment-date').value;
+    
+    // Validaciones
+    if (!providerId || isNaN(amount) || amount <= 0 || !concept || !paymentDate) {
+        alert('Por favor complete todos los campos correctamente');
+        return;
+    }
+    
+    // Crear nuevo pago
+    const newPayment = {
+        id: nextPaymentId++,
+        providerId,
+        amount,
+        concept,
+        date: paymentDate,
+        status: 'Completado',
+        createdAt: new Date().toISOString()
+    };
+    
+    // Agregar a la lista de pagos
+    payments.unshift(newPayment);
+    
+    // Guardar en localStorage
+    localStorage.setItem('payments', JSON.stringify(payments));
+    
+    // Actualizar la interfaz
+    renderPaymentsTable();
+    updateSummary();
+    
+    // Cerrar el modal y limpiar el formulario
+    closeNewPaymentModal();
+    
+    // Mostrar notificación de éxito
+    alert('Pago registrado exitosamente');
+}
+
 // Configurar event listeners
 function setupEventListeners() {
-    applyFiltersBtn.addEventListener('click', applyFilters);
+    console.log('Configurando event listeners...');
     
-    resetFiltersBtn.addEventListener('click', () => {
-        providerFilter.value = '';
-        statusFilter.value = '';
-        dateRange.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
-        renderPaymentsTable();
+    // Botón de nuevo pago
+    console.log('Buscando botón con id new-payment-btn');
+    const newPaymentButton = document.getElementById('new-payment-btn');
+    console.log('Botón encontrado en setupEventListeners:', newPaymentButton);
+    
+    if (newPaymentButton) {
+        console.log('Configurando botón nuevo pago');
+        newPaymentButton.addEventListener('click', function() {
+            console.log('Click en botón nuevo pago detectado');
+            showNewPaymentModal();
+        });
+    } else {
+        console.error('No se encontró el botón de nuevo pago');
+    }
+    
+    // Filtros y botones existentes
+    if (applyFiltersBtn) applyFiltersBtn.addEventListener('click', applyFilters);
+    if (resetFiltersBtn) resetFiltersBtn.addEventListener('click', resetFilters);
+    if (exportPdfBtn) exportPdfBtn.addEventListener('click', exportToPdf);
+    
+    // Eventos del modal de nuevo pago
+    if (newPaymentForm) newPaymentForm.addEventListener('submit', handleNewPaymentSubmit);
+    if (closeModalBtn) closeModalBtn.addEventListener('click', closeNewPaymentModal);
+    if (cancelPaymentBtn) cancelPaymentBtn.addEventListener('click', closeNewPaymentModal);
+    
+    // Cerrar modal al hacer clic fuera del contenido
+    window.addEventListener('click', (e) => {
+        if (e.target === newPaymentModal) {
+            closeNewPaymentModal();
+        }
     });
     
-    newPaymentBtn.addEventListener('click', () => {
-        // Redirigir a la página de nuevo pago o mostrar modal
-        window.location.href = 'index.html#payments';
-    });
-    
-    exportPdfBtn.addEventListener('click', exportToPdf);
+    console.log('Event listeners configurados');
 }
 
 // Función para ver detalles del pago
@@ -170,6 +304,15 @@ function printReceipt(paymentId) {
 function exportToPdf() {
     // Implementar lógica de exportación a PDF
     alert('Exportando a PDF...');
+}
+
+// Función para resetear filtros
+function resetFilters() {
+    providerFilter.value = '';
+    statusFilter.value = '';
+    const today = new Date();
+    dateRange.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+    renderPaymentsTable();
 }
 
 // Inicializar la aplicación cuando el DOM esté listo
