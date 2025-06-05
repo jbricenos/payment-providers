@@ -299,9 +299,7 @@
     margin: 0;
 }
 
-#new-payment-modal input[type="number"] {
-    -moz-appearance: textfield;
-}
+
 
 /* Estilos responsivos */
 @media (max-width: 768px) {

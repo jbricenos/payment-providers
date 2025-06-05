@@ -7,7 +7,7 @@ let nextPaymentId = payments.length > 0 ? Math.max(...payments.map(p => p.id)) +
 const paymentsTable = document.getElementById('payments-table');
 const providerFilter = document.getElementById('provider-filter');
 const statusFilter = document.getElementById('status-filter');
-const dateRange = document.getElementById('date-range');
+const dateRange = document.getElementById('ten-range');
 const applyFiltersBtn = document.getElementById('apply-filters');
 const resetFiltersBtn = document.getElementById('reset-filters');
 const newPaymentBtn = document.getElementById('new-payment-btn');
@@ -25,48 +25,126 @@ dateRange.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStar
 
 // Inicialización
 function init() {
+    if (init.initialized) {
+        console.log('La aplicación ya fue inicializada');
+        return;
+    }
+    
     console.log('Inicializando aplicación de pagos...');
-    console.log('Botón newPaymentBtn en init:', newPaymentBtn);
+    
+    // Cargar datos del localStorage
+    payments = JSON.parse(localStorage.getItem('payments') || '[]');
+    providers = JSON.parse(localStorage.getItem('providers') || '[]');
+    nextPaymentId = payments.length > 0 ? Math.max(...payments.map(p => p.id)) + 1 : 1;
+    
+    // Configurar la interfaz
+    setupEventListeners();
     loadProviders();
+    loadDecades();
     renderPaymentsTable();
     updateSummary();
-    setupEventListeners();
+    
+    // Marcar que la inicialización ya se realizó
+    init.initialized = true;
+    console.log('Aplicación inicializada correctamente');
+}
+
+// Cargar decenas en el selector
+function loadDecades() {
+    try {
+        console.log('Cargando decenas...');
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        
+        // Configurar fechas para cargar decenas de mayo a junio del año actual
+        const startDate = new Date(currentYear, 4, 1); // 1 de mayo (los meses son 0-indexados)
+        const endDate = new Date(currentYear, 5, 30);   // 30 de junio
+        
+        // Llamar a la función del generador de decenas
+        populateDecadeSelect('payment-decade', startDate, endDate, true);
+        console.log('decenas cargadas correctamente');
+    } catch (error) {
+        console.error('Error al cargar las decenas:', error);
+    }
 }
 
 // Cargar proveedores en los filtros y formularios
 function loadProviders() {
-    // Limpiar selects
-    providerFilter.innerHTML = '<option value="">Todos los proveedores</option>';
-    const paymentProviderSelect = document.getElementById('payment-provider');
+    console.log('=== Iniciando carga de proveedores ===');
     
-    if (paymentProviderSelect) {
-        // Guardar la opción por defecto
-        const defaultOption = paymentProviderSelect.querySelector('option[value=""]') || 
-                             document.createElement('option');
-        defaultOption.value = '';
-        defaultOption.textContent = 'Seleccionar proveedor';
-        
-        // Limpiar y restaurar la opción por defecto
-        paymentProviderSelect.innerHTML = '';
-        paymentProviderSelect.appendChild(defaultOption);
+    // Obtener referencias a los elementos del DOM
+    const providerSelect = document.getElementById('payment-provider');
+    const providerFilter = document.getElementById('provider-filter');
+    
+    if (!providerSelect || !providerFilter) {
+        console.error('Error: No se encontraron los elementos del DOM necesarios');
+        return;
     }
     
-    // Llenar ambos selects con los proveedores
-    providers.forEach(provider => {
-        // Para el filtro
-        const filterOption = document.createElement('option');
-        filterOption.value = provider.id;
-        filterOption.textContent = provider.name;
-        providerFilter.appendChild(filterOption);
-        
-        // Para el formulario de pago
-        if (paymentProviderSelect) {
-            const paymentOption = document.createElement('option');
-            paymentOption.value = provider.id;
-            paymentOption.textContent = provider.name;
-            paymentProviderSelect.appendChild(paymentOption);
+    console.log('Limpiando selects de proveedores...');
+    
+    // Limpiar completamente los selects
+    providerSelect.innerHTML = '<option value="">Seleccionar proveedor</option>';
+    providerFilter.innerHTML = '<option value="">Todos los proveedores</option>';
+    
+    // Obtener proveedores del localStorage
+    const storedProviders = JSON.parse(localStorage.getItem('providers') || '[]');
+    console.log('Proveedores encontrados en localStorage:', storedProviders.length);
+    
+    if (!Array.isArray(storedProviders) || storedProviders.length === 0) {
+        console.log('No hay proveedores para cargar');
+        return;
+    }
+    
+    // Usar un Map para asegurar que no haya duplicados por ID
+    const uniqueProviders = new Map();
+    
+    // Filtrar y limpiar proveedores
+    storedProviders.forEach(provider => {
+        if (provider && provider.id !== undefined && provider.name) {
+            const id = String(provider.id).trim();
+            // Guardar el objeto completo del proveedor
+            uniqueProviders.set(id, {
+                ...provider,
+                id: parseInt(id, 10),
+                name: String(provider.name).trim()
+            });
         }
     });
+    
+    console.log('Proveedores únicos después de filtrar:', uniqueProviders.size);
+    
+    // Actualizar el array global de proveedores primero
+    window.providers = Array.from(uniqueProviders.values());
+    
+    // Llenar el select de filtro con todos los proveedores
+    uniqueProviders.forEach((provider, id) => {
+        // Verificar si la opción ya existe
+        const existingOption = Array.from(providerFilter.options).find(opt => opt.value === id);
+        if (!existingOption) {
+            const option = document.createElement('option');
+            option.value = id;
+            option.textContent = provider.name;
+            providerFilter.appendChild(option);
+        }
+    });
+    
+    // Llenar el select del formulario de pago solo con proveedores activos
+    uniqueProviders.forEach((provider, id) => {
+        // Solo agregar si el proveedor está activo
+        if (provider.status === 'Activo') {
+            const existingOption = Array.from(providerSelect.options).find(opt => opt.value === id);
+            if (!existingOption) {
+                const option = document.createElement('option');
+                option.value = id;
+                option.textContent = provider.name;
+                providerSelect.appendChild(option);
+            }
+        }
+    });
+    
+    console.log('=== Carga de proveedores completada ===');
+    console.log('Proveedores cargados:', uniqueProviders.size);
 }
 
 // Renderizar la tabla de pagos
@@ -90,12 +168,17 @@ function renderPaymentsTable(filteredPayments = null) {
             currency: 'CLP'
         }).format(payment.amount);
         
+        // Obtener información de la decena si existe
+        const decadeInfo = payment.decade ? 
+            payment.decade.label || `decena ${payment.decade.code}` : 
+            'No especificada';
+            
         return `
             <tr>
                 <td>${formattedDate}</td>
                 <td>#${String(payment.id).padStart(4, '0')}</td>
                 <td>${provider.name || 'Proveedor no encontrado'}</td>
-                <td>${payment.periodStart} al ${payment.periodEnd}</td>
+                <td>${decadeInfo}</td>
                 <td>${formattedAmount}</td>
                 <td>
                     <span class="status-badge status-${payment.status}">
@@ -103,7 +186,7 @@ function renderPaymentsTable(filteredPayments = null) {
                     </span>
                 </td>
                 <td class="action-buttons">
-                    <button class="btn  btn-info" onclick="editPayment(${payment.id})">
+                    <button class="btn btn-info" onclick="editPayment(${payment.id})">
                         <i class="ti-pencil"></i> Editar
                     </button>
                     <button class="btn btn-sm btn-danger" onclick="deletePayment(${payment.id}, this); return false;">
@@ -169,21 +252,22 @@ function applyFilters() {
 function showNewPaymentModal() {
     console.log('Mostrando modal de nuevo pago');
     
-    // Cargar proveedores en el select
+    // Cargar proveedores usando la función centralizada
+    // Esto ya maneja la carga de proveedores activos en el select
+    loadProviders();
+    
+    // Actualizar el select del formulario de pago
     const providerSelect = document.getElementById('payment-provider');
-    if (providerSelect) {
-        
-        const activeProviders = providers.filter(p => p.status === 'Activo');
-        console.log('Proveedores activos:', activeProviders);
-        
-        activeProviders.forEach(provider => {
-            const option = document.createElement('option');
-            option.value = provider.id;
-            option.textContent = provider.name;
-            providerSelect.appendChild(option);
-        });
+    if (!providerSelect) {
+        console.error('No se encontró el select de proveedores');
+        return;
+    }
+    
+    // Verificar que hay opciones cargadas
+    if (providerSelect.options.length <= 1) {
+        console.log('No hay proveedores activos disponibles');
     } else {
-        console.error('No se encontró el elemento payment-provider');
+        console.log('Proveedores cargados en el select:', providerSelect.options.length - 1);
     }
     
     // Establecer fecha actual como valor por defecto
@@ -260,12 +344,20 @@ function handleNewPaymentSubmit(e) {
     const amount = parseFloat(document.getElementById('payment-amount').value);
     const concept = document.getElementById('payment-concept').value.trim();
     const paymentDate = document.getElementById('payment-date').value;
+    const decadeCode = document.getElementById('payment-decade').value;
     const paymentIdInput = document.getElementById('payment-id');
     const isEditMode = paymentIdInput && paymentIdInput.value !== '';
     
     // Validaciones
-    if (!providerId || isNaN(amount) || amount <= 0 || !concept || !paymentDate) {
+    if (!providerId || isNaN(amount) || amount <= 0 || !concept || !paymentDate || !decadeCode) {
         alert('Por favor complete todos los campos correctamente');
+        return;
+    }
+    
+    // Obtener el objeto de decena seleccionado
+    const selectedDecade = getDecadeByCode(decadeCode);
+    if (!selectedDecade) {
+        alert('La decena seleccionada no es válida');
         return;
     }
     
@@ -275,6 +367,13 @@ function handleNewPaymentSubmit(e) {
         const paymentIndex = payments.findIndex(p => p.id === paymentId);
         
         if (paymentIndex !== -1) {
+            // Validar y formatear fechas
+            const formatDate = (date) => {
+                if (!date) return null;
+                const d = date instanceof Date ? date : new Date(date);
+                return isNaN(d.getTime()) ? null : d.toISOString();
+            };
+            
             // Actualizar el pago existente
             payments[paymentIndex] = {
                 ...payments[paymentIndex],
@@ -282,6 +381,12 @@ function handleNewPaymentSubmit(e) {
                 amount,
                 concept,
                 date: paymentDate,
+                decade: {
+                    code: selectedDecade.code,
+                    label: selectedDecade.label,
+                    startDate: formatDate(selectedDecade.startDate) || new Date().toISOString(),
+                    endDate: formatDate(selectedDecade.endDate) || new Date().toISOString()
+                },
                 updatedAt: new Date().toISOString()
             };
             
@@ -302,12 +407,25 @@ function handleNewPaymentSubmit(e) {
         }
     } else {
         // Modo creación: Crear nuevo pago
+        // Validar y formatear fechas
+        const formatDate = (date) => {
+            if (!date) return null;
+            const d = date instanceof Date ? date : new Date(date);
+            return isNaN(d.getTime()) ? null : d.toISOString();
+        };
+
         const newPayment = {
             id: nextPaymentId++,
             providerId,
             amount,
             concept,
             date: paymentDate,
+            decade: {
+                code: selectedDecade.code,
+                label: selectedDecade.label,
+                startDate: formatDate(selectedDecade.startDate) || new Date().toISOString(),
+                endDate: formatDate(selectedDecade.endDate) || new Date().toISOString()
+            },
             status: 'Completado',
             createdAt: new Date().toISOString()
         };
@@ -341,10 +459,7 @@ function setupEventListeners() {
     
     if (newPaymentButton) {
         console.log('Configurando botón nuevo pago');
-        newPaymentButton.addEventListener('click', function() {
-            console.log('Click en botón nuevo pago detectado');
-            showNewPaymentModal();
-        });
+        newPaymentButton.addEventListener('click', showNewPaymentModal);
     } else {
         console.error('No se encontró el botón de nuevo pago');
     }
@@ -418,9 +533,27 @@ function editPayment(paymentId) {
         providerSelect.style.display = 'none';
         providerSelect._displayElement.style.display = 'block';
     }
+    document.getElementById('payment-provider').value = payment.providerId;
     document.getElementById('payment-amount').value = payment.amount;
     document.getElementById('payment-concept').value = payment.concept;
-    document.getElementById('payment-date').value = payment.date;
+    document.getElementById('payment-date').value = payment.date.split('T')[0];
+    
+    // Establecer la decena si existe
+    if (payment.decade && payment.decade.code) {
+        const decadeSelect = document.getElementById('payment-decade');
+        if (decadeSelect) {
+            // Verificar si la opción existe en el select
+            const optionExists = Array.from(decadeSelect.options).some(opt => opt.value === payment.decade.code);
+            if (optionExists) {
+                decadeSelect.value = payment.decade.code;
+            } else {
+                // Si la opción no existe, agregarla
+                const option = new Option(payment.decade.label, payment.decade.code);
+                decadeSelect.add(option);
+                decadeSelect.value = payment.decade.code;
+            }
+        }
+    }
     
     // Cambiar el título del modal
     document.querySelector('#new-payment-modal .modal-header h2').textContent = 'Editar Pago';
@@ -579,9 +712,96 @@ function resetFilters() {
     renderPaymentsTable();
 }
 
-// Inicializar la aplicación cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', init);
+// Función para generar códigos de decenas
+function generateDecadeCodes() {
+    const year = new Date().getFullYear();
+    const month = new Date().getMonth() + 1; // Los meses van de 0 a 11
+    const decades = [];
+    
+    // Generar decenas para los últimos 3 meses y los próximos 3 meses
+    for (let m = month - 3; m <= month + 3; m++) {
+        let currentMonth = m;
+        let currentYear = year;
+        
+        // Ajustar año si el mes es menor a 1 o mayor a 12
+        if (currentMonth < 1) {
+            currentMonth += 12;
+            currentYear--;
+        } else if (currentMonth > 12) {
+            currentMonth -= 12;
+            currentYear++;
+        }
+        
+        // Generar códigos para las tres decenas del mes
+        for (let d = 1; d <= 3; d++) {
+            const decadeCode = `${d}${currentMonth.toString().padStart(2, '0')}${currentYear}`;
+            const startDay = (d - 1) * 10 + 1;
+            let endDay = d * 10;
+            
+            // Ajustar el último día de la tercera decena según el mes
+            if (d === 3) {
+                const lastDay = new Date(currentYear, currentMonth, 0).getDate();
+                endDay = Math.min(30, lastDay);
+            }
+            
+            const label = `decena ${d} (${startDay}-${endDay}/${currentMonth.toString().padStart(2, '0')}/${currentYear})`;
+            decades.push({ code: decadeCode, label });
+        }
+    }
+    
+    return decades;
+}
 
-// Funciones globales para los botones
-window.viewPaymentDetails = viewPaymentDetails;
-window.printReceipt = printReceipt;
+// Obtener un objeto de decena por su código
+function getDecadeByCode(decadeCode) {
+    if (!decadeCode) return null;
+    
+    try {
+        const currentYear = new Date().getFullYear();
+        const startDate = new Date(currentYear, 4, 1); // 1 de mayo
+        const endDate = new Date(currentYear, 5, 30);   // 30 de junio
+        
+        const decades = generateDecadeCodes(startDate, endDate);
+        return decades.find(d => d.code === decadeCode) || null;
+    } catch (error) {
+        console.error('Error al obtener la decena:', error);
+        return null;
+    }
+}
+
+// Función para cargar los rangos de fechas en el select
+function loadDateRanges() {
+    const dateRangeSelect = document.getElementById('ten-range');
+    if (!dateRangeSelect) return;
+    
+    // Limpiar opciones existentes
+    dateRangeSelect.innerHTML = '';
+    
+    // Agregar opción por defecto
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Seleccionar período';
+    dateRangeSelect.appendChild(defaultOption);
+    
+    // Generar y agregar opciones de decenas
+    const decades = generateDecadeCodes();
+    decades.forEach(decade => {
+        const option = document.createElement('option');
+        option.value = decade.code;
+        option.textContent = decade.label;
+        dateRangeSelect.appendChild(option);
+    });
+}
+
+// Inicializar la aplicación cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        // Solo inicializar si no se ha hecho antes
+        if (!init.initialized) {
+            init();
+            loadDateRanges();
+        }
+    } catch (error) {
+        console.error('Error al inicializar la aplicación:', error);
+    }
+});
