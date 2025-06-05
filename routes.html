@@ -1,123 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rutas y Horarios - Costa Transportes</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
-    <style>
-        /* Specific styles for routes page */
-        .routes-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .route-selector {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-
-        .route-form {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 0;
-        }
-
-        .route-results {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .route-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .route-title {
-            margin: 0;
-            color: #2c3e50;
-            font-size: 1.5rem;
-        }
-
-        .route-details {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #7f8c8d;
-        }
-
-        .route-arrow {
-            color: #3498db;
-        }
-
-        .time-slots {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .time-slot {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 6px;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .time-slot:hover {
-            background: #e9ecef;
-            transform: translateY(-2px);
-        }
-
-        .time-slot.selected {
-            background: #3498db;
-            color: white;
-            border-color: #3498db;
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 30px;
-            color: #7f8c8d;
-            font-style: italic;
-        }
-
-        @media (max-width: 768px) {
-            .route-form {
-                grid-template-columns: 1fr;
-            }
-            
-            .time-slots {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .time-slots {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/table.css">
 </head>
+
 <body>
     <div class="container">
         <!-- Sidebar -->
@@ -128,7 +20,7 @@
                 </div>
             </div>
             <nav class="nav-menu">
-                <a href="#" class="nav-link" data-tab="providers">
+                <a href="index.html" class="nav-link" data-tab="providers">
                     <i class="ti-home sidemenu-icon menu-icon"></i>
                     <span class="menu-title">Proveedores</span>
                 </a>
@@ -149,5 +41,264 @@
                 <h1>Rutas</h1>
             </div>
 
-</body>
+<div class="providersTable">
+            <table  id="proveedoresTable">
+                <thead>
+                    <tr>
+                        <th class="col-a">#</th>
+                        <th class="col-b">Proveedor</th>
+                        <th class="col-c">Representante</th>
+                        <th class="col-d">Ruta</th>
+                        <th class="col-e">Decena</th>
+                        <th class="col-f">Precio<br>por KM</th>
+                        <th class="col-g">Precio<br>Promedio/asiento</th>
+                        <th class="col-h">KM<br>Ofrecidos</th>
+                        <th class="col-i">KM<br>Vendidos</th>
+                        <th class="col-j">%<br>Ocupación</th>
+                        <th class="col-k">Pasajeros</th>
+                        <th class="col-l">Producción<br>Total</th>
+                        <th class="col-m">Comisión<br>Pullman</th>
+                        <th class="col-n">Pago<br>Neto</th>
+                        <th class="col-o">Estado<br>Pago</th>
+                        <th class="col-p">Acumulado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Proveedor 1: Tacoha -->
+                    <tr>
+                        <td class="row-number">1</td>
+                        <td class="provider-main">Tacoha</td>
+                        <td class="provider-main">Jorge Martinez</td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="commission">20%</td>
+                        <td class="provider-data"></td>
+                        <td class="approval-r">R</td>
+                        <td class="provider-data"></td>
+                    </tr>
+
+                    <tr>
+                        <td class="provider-data"></td>
+                        <td class="provider-data">ABC123</td>
+                        <td class="provider-data">-</td>
+                        <td class="provider-data">Santiago - Viña del Mar</td>
+                        <td class="provider-data"></td>
+                        <td class="currency">$1,380</td>
+                        <td class="currency">$5,600</td>
+                        <td class="numeric">233200</td>
+                        <td class="numeric">123430</td>
+                        <td class="percentage">53%</td>
+                        <td class="numeric">6523</td>
+                        <td class="currency">$2,350,000</td>
+                        <td class="currency">$470,000</td>
+                        <td class="currency">$1,880,000</td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                    </tr>
+
+                    <tr>
+                        <td class="provider-data"></td>
+                        <td class="provider-data">XYZ456</td>
+                        <td class="provider-data">-</td>
+                        <td class="provider-data">Valparaíso - Santiago</td>
+                        <td class="provider-data"></td>
+                        <td class="currency">$900</td>
+                        <td class="currency">$4,300</td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="currency">$1,560,000</td>
+                        <td class="currency">$312,000</td>
+                        <td class="currency">$1,248,000</td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                    </tr>
+
+                    <tr>
+                        <td class="provider-data"></td>
+                        <td class="provider-data">MNC789</td>
+                        <td class="provider-data">-</td>
+                        <td class="provider-data">Iquique - Arica</td>
+                        <td class="provider-data"></td>
+                        <td class="currency">$876</td>
+                        <td class="currency">$6,100</td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="currency">$2,100,000</td>
+                        <td class="currency">$420,000</td>
+                        <td class="currency">$1,680,000</td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                    </tr>
+
+                    <!-- Fila vacía -->
+                    <tr class="empty-row">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
+                    <!-- Proveedor 2: Traveltur -->
+                    <tr>
+                        <td class="row-number">2</td>
+                        <td class="provider-main">Traveltur</td>
+                        <td class="provider-main">Rodrigo Muñoz</td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="commission">15%</td>
+                        <td class="provider-data"></td>
+                        <td class="approval-t">T</td>
+                        <td class="provider-data"></td>
+                    </tr>
+
+                    <tr>
+                        <td class="provider-data"></td>
+                        <td class="provider-data">ABC123</td>
+                        <td class="provider-data">-</td>
+                        <td class="provider-data">Santiago - Valdivia</td>
+                        <td class="provider-data"></td>
+                        <td class="currency">$1,380</td>
+                        <td class="currency">$5,600</td>
+                        <td class="numeric">233200</td>
+                        <td class="numeric">123430</td>
+                        <td class="percentage">53%</td>
+                        <td class="numeric">6523</td>
+                        <td class="currency">$2,350,000</td>
+                        <td class="currency">$470,000</td>
+                        <td class="currency">$1,880,000</td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                    </tr>
+
+                    <tr>
+                        <td class="provider-data"></td>
+                        <td class="provider-data">XYZ456</td>
+                        <td class="provider-data">-</td>
+                        <td class="provider-data">Valparaíso - La Serena</td>
+                        <td class="provider-data"></td>
+                        <td class="currency">$900</td>
+                        <td class="currency">$4,300</td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="currency">$1,560,000</td>
+                        <td class="currency">$312,000</td>
+                        <td class="currency">$1,248,000</td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                    </tr>
+
+                    <tr>
+                        <td class="provider-data"></td>
+                        <td class="provider-data">MNC789</td>
+                        <td class="provider-data">-</td>
+                        <td class="provider-data">Iquique - Calama</td>
+                        <td class="provider-data"></td>
+                        <td class="currency">$876</td>
+                        <td class="currency">$6,100</td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                        <td class="currency">$2,100,000</td>
+                        <td class="currency">$420,000</td>
+                        <td class="currency">$1,680,000</td>
+                        <td class="provider-data"></td>
+                        <td class="provider-data"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+        <script>
+            // Funcionalidad para agregar interactividad
+            document.addEventListener('DOMContentLoaded', function () {
+                const table = document.getElementById('proveedoresTable');
+
+                // Función para formatear números como moneda
+                function formatCurrency(value) {
+                    if (!value || value === '') return '';
+                    const num = parseFloat(value.replace(/[\$,]/g, ''));
+                    if (isNaN(num)) return value;
+                    return '$' + num.toLocaleString('es-CL');
+                }
+
+                // Función para formatear números
+                function formatNumber(value) {
+                    if (!value || value === '') return '';
+                    const num = parseFloat(value.replace(/[,]/g, ''));
+                    if (isNaN(num)) return value;
+                    return num.toLocaleString('es-CL');
+                }
+
+                // Agregar funcionalidad de edición en línea (opcional)
+                const editableCells = table.querySelectorAll('.currency, .numeric');
+                editableCells.forEach(cell => {
+                    cell.addEventListener('dblclick', function () {
+                        const originalText = this.textContent;
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.value = originalText;
+                        input.style.width = '100%';
+                        input.style.border = 'none';
+                        input.style.outline = 'none';
+                        input.style.background = '#fff3cd';
+
+                        this.textContent = '';
+                        this.appendChild(input);
+                        input.focus();
+
+                        function saveChanges() {
+                            const newValue = input.value;
+                            this.textContent = newValue;
+                            // Aquí puedes agregar lógica para guardar los cambios
+                            // Por ejemplo, usando fetch para enviar al servidor
+                            console.log('Nuevo valor:', newValue);
+                        }
+
+                        input.addEventListener('blur', saveChanges);
+                        input.addEventListener('keypress', function (e) {
+                            if (e.key === 'Enter') {
+                                saveChanges();
+                            } else if (e.key === 'Escape') {
+                                this.parentNode.textContent = originalText;
+                            }
+                        });
+                    });
+                });
+            });
+
+        </script>
+    </body>
 </html>

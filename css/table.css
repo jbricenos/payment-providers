@@ -1,0 +1,190 @@
+.providersTable{
+    margin-top: 200px;
+    padding: 20px;
+}
+       
+       
+       table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            table-layout: fixed;
+        }
+
+        th,
+        td {
+            border: 1px solid #d4d4d4;
+            padding: 4px 6px;
+            text-align: left;
+            height: 20px;
+            vertical-align: middle;
+        }
+
+        /* Encabezados */
+        .header {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            text-align: center;
+            color: #2c3e50;
+            font-size: 10px;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 8px 4px;
+        }
+
+        /* Columna de numeración */
+        .row-number {
+            width: 36px;
+            text-align: center;
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        /* Proveedor principal */
+        .provider-main {
+            background-color: #e8f4fd;
+            font-weight: bold;
+            color: #1f4e79;
+        }
+
+        /* Datos del proveedor */
+        .provider-data {
+            background-color: #f9f9f9;
+        }
+
+        /* Celdas de comisión */
+        .commission {
+            text-align: center;
+            font-weight: bold;
+            color: #d9534f;
+        }
+
+        /* Estado de aprobación */
+        .approval-r {
+            text-align: center;
+            background-color: #d4edda;
+            color: #155724;
+            font-weight: bold;
+        }
+
+        .approval-t {
+            text-align: center;
+            background-color: #cce5ff;
+            color: #004085;
+            font-weight: bold;
+        }
+
+        /* Columnas de moneda */
+        .currency {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Columnas numéricas */
+        .numeric {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Columnas de porcentaje */
+        .percentage {
+            text-align: center;
+        }
+
+        /* Anchos específicos de columnas */
+        .col-a {
+            width: 36px;
+        }
+
+        .col-b {
+            width: 114px;
+        }
+
+        .col-c {
+            width: 101px;
+        }
+
+        .col-d {
+            width: 105px;
+        }
+
+        .col-e {
+            width: 96px;
+        }
+
+        .col-f {
+            width: 69px;
+        }
+
+        .col-g {
+            width: 112px;
+        }
+
+        .col-h {
+            width: 102px;
+        }
+
+        .col-i {
+            width: 67px;
+        }
+
+        .col-j {
+            width: 87px;
+        }
+
+        .col-k {
+            width: 67px;
+        }
+
+        .col-l {
+            width: 78px;
+        }
+
+        .col-m {
+            width: 77px;
+        }
+
+        .col-n {
+            width: 86px;
+        }
+
+        .col-o {
+            width: 86px;
+        }
+
+        .col-p {
+            width: 101px;
+        }
+
+        /* Fila vacía */
+        .empty-row {
+            height: 20px;
+        }
+
+        /* Hover effect */
+        tr:hover {
+            background-color: #f0f8ff;
+        }
+
+        .header:hover {
+            background-color: #e9ecef !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            table {
+                font-size: 9px;
+            }
+
+            th,
+            td {
+                padding: 2px 4px;
+            }
+        }
