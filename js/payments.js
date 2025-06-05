@@ -33,15 +33,39 @@ function init() {
     setupEventListeners();
 }
 
-// Cargar proveedores en el filtro
+// Cargar proveedores en los filtros y formularios
 function loadProviders() {
+    // Limpiar selects
     providerFilter.innerHTML = '<option value="">Todos los proveedores</option>';
+    const paymentProviderSelect = document.getElementById('payment-provider');
     
+    if (paymentProviderSelect) {
+        // Guardar la opción por defecto
+        const defaultOption = paymentProviderSelect.querySelector('option[value=""]') || 
+                             document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Seleccionar proveedor';
+        
+        // Limpiar y restaurar la opción por defecto
+        paymentProviderSelect.innerHTML = '';
+        paymentProviderSelect.appendChild(defaultOption);
+    }
+    
+    // Llenar ambos selects con los proveedores
     providers.forEach(provider => {
-        const option = document.createElement('option');
-        option.value = provider.id;
-        option.textContent = provider.name;
-        providerFilter.appendChild(option);
+        // Para el filtro
+        const filterOption = document.createElement('option');
+        filterOption.value = provider.id;
+        filterOption.textContent = provider.name;
+        providerFilter.appendChild(filterOption);
+        
+        // Para el formulario de pago
+        if (paymentProviderSelect) {
+            const paymentOption = document.createElement('option');
+            paymentOption.value = provider.id;
+            paymentOption.textContent = provider.name;
+            paymentProviderSelect.appendChild(paymentOption);
+        }
     });
 }
 
@@ -79,11 +103,11 @@ function renderPaymentsTable(filteredPayments = null) {
                     </span>
                 </td>
                 <td class="action-buttons">
-                    <button class="btn btn-sm btn-primary" onclick="viewPaymentDetails(${payment.id})">
-                        <i class="ti-eye"></i> Ver
+                    <button class="btn  btn-info" onclick="editPayment(${payment.id})">
+                        <i class="ti-pencil"></i> Editar
                     </button>
-                    <button class="btn btn-sm btn-secondary" onclick="printReceipt(${payment.id})">
-                        <i class="ti-printer"></i>
+                    <button class="btn btn-sm btn-danger" onclick="deletePayment(${payment.id}, this); return false;">
+                        <i class="ti-trash"></i> Eliminar
                     </button>
                 </td>
             </tr>
@@ -148,7 +172,6 @@ function showNewPaymentModal() {
     // Cargar proveedores en el select
     const providerSelect = document.getElementById('payment-provider');
     if (providerSelect) {
-        providerSelect.innerHTML = '<option value="">Seleccionar proveedor</option>';
         
         const activeProviders = providers.filter(p => p.status === 'Activo');
         console.log('Proveedores activos:', activeProviders);
@@ -190,10 +213,36 @@ function closeNewPaymentModal() {
         newPaymentModal.classList.remove('show');
         document.body.style.overflow = 'auto';
         
-        // Esperar a que termine la animación para resetear el formulario
         setTimeout(() => {
             if (newPaymentForm) {
                 newPaymentForm.reset();
+                
+                // Restaurar el título original del modal
+                const modalTitle = document.querySelector('#new-payment-modal .modal-header h2');
+                if (modalTitle) {
+                    modalTitle.textContent = 'Registrar Nuevo Pago';
+                }
+                
+                // Eliminar el campo oculto del ID del pago si existe
+                const paymentIdInput = document.getElementById('payment-id');
+                if (paymentIdInput) {
+                    paymentIdInput.remove();
+                }
+                
+                // Reactivar y limpiar el select de proveedores
+                const providerSelect = document.getElementById('payment-provider');
+                if (providerSelect) {
+                    // Restaurar la visualización del select
+                    providerSelect.style.display = '';
+                    providerSelect.disabled = false;
+                    providerSelect.classList.remove('disabled');
+                    
+                    // Eliminar el elemento de visualización si existe
+                    if (providerSelect._displayElement) {
+                        providerSelect._displayElement.remove();
+                        delete providerSelect._displayElement;
+                    }
+                }
             }
         }, 300);
         
@@ -203,7 +252,7 @@ function closeNewPaymentModal() {
     }
 }
 
-// Manejar envío del formulario de nuevo pago
+// Manejar envío del formulario de nuevo/edición de pago
 function handleNewPaymentSubmit(e) {
     e.preventDefault();
     
@@ -211,6 +260,8 @@ function handleNewPaymentSubmit(e) {
     const amount = parseFloat(document.getElementById('payment-amount').value);
     const concept = document.getElementById('payment-concept').value.trim();
     const paymentDate = document.getElementById('payment-date').value;
+    const paymentIdInput = document.getElementById('payment-id');
+    const isEditMode = paymentIdInput && paymentIdInput.value !== '';
     
     // Validaciones
     if (!providerId || isNaN(amount) || amount <= 0 || !concept || !paymentDate) {
@@ -218,32 +269,65 @@ function handleNewPaymentSubmit(e) {
         return;
     }
     
-    // Crear nuevo pago
-    const newPayment = {
-        id: nextPaymentId++,
-        providerId,
-        amount,
-        concept,
-        date: paymentDate,
-        status: 'Completado',
-        createdAt: new Date().toISOString()
-    };
-    
-    // Agregar a la lista de pagos
-    payments.unshift(newPayment);
-    
-    // Guardar en localStorage
-    localStorage.setItem('payments', JSON.stringify(payments));
-    
-    // Actualizar la interfaz
-    renderPaymentsTable();
-    updateSummary();
-    
-    // Cerrar el modal y limpiar el formulario
-    closeNewPaymentModal();
-    
-    // Mostrar notificación de éxito
-    alert('Pago registrado exitosamente');
+    if (isEditMode) {
+        // Modo edición: Actualizar pago existente
+        const paymentId = parseInt(paymentIdInput.value);
+        const paymentIndex = payments.findIndex(p => p.id === paymentId);
+        
+        if (paymentIndex !== -1) {
+            // Actualizar el pago existente
+            payments[paymentIndex] = {
+                ...payments[paymentIndex],
+                providerId,
+                amount,
+                concept,
+                date: paymentDate,
+                updatedAt: new Date().toISOString()
+            };
+            
+            // Guardar cambios
+            localStorage.setItem('payments', JSON.stringify(payments));
+            
+            // Actualizar la interfaz
+            renderPaymentsTable();
+            updateSummary();
+            
+            // Cerrar el modal
+            closeNewPaymentModal();
+            
+            // Mostrar notificación de éxito
+            alert('Pago actualizado exitosamente');
+        } else {
+            alert('No se pudo encontrar el pago a actualizar');
+        }
+    } else {
+        // Modo creación: Crear nuevo pago
+        const newPayment = {
+            id: nextPaymentId++,
+            providerId,
+            amount,
+            concept,
+            date: paymentDate,
+            status: 'Completado',
+            createdAt: new Date().toISOString()
+        };
+        
+        // Agregar a la lista de pagos
+        payments.unshift(newPayment);
+        
+        // Guardar en localStorage
+        localStorage.setItem('payments', JSON.stringify(payments));
+        
+        // Actualizar la interfaz
+        renderPaymentsTable();
+        updateSummary();
+        
+        // Cerrar el modal y limpiar el formulario
+        closeNewPaymentModal();
+        
+        // Mostrar notificación de éxito
+        alert('Pago registrado exitosamente');
+    }
 }
 
 // Configurar event listeners
@@ -285,19 +369,199 @@ function setupEventListeners() {
     console.log('Event listeners configurados');
 }
 
-// Función para ver detalles del pago
-function viewPaymentDetails(paymentId) {
+// Función para editar un pago existente
+function editPayment(paymentId) {
+    console.log('Editando pago con ID:', paymentId);
     const payment = payments.find(p => p.id === paymentId);
-    if (payment) {
-        // Aquí podrías mostrar un modal con los detalles completos del pago
-        alert(`Detalles del pago #${paymentId}\nMonto: $${payment.amount}\nProveedor: ${providers.find(p => p.id === payment.providerId)?.name || 'N/A'}`);
+    
+    if (!payment) {
+        console.error('No se encontró el pago con ID:', paymentId);
+        alert('No se pudo cargar la información del pago seleccionado.');
+        return;
+    }
+    
+    // Obtener referencia al select de proveedores
+    const providerSelect = document.getElementById('payment-provider');
+    if (!providerSelect) {
+        console.error('No se encontró el select de proveedores');
+        return;
+    }
+    
+    // Deshabilitar el select inmediatamente
+    providerSelect.disabled = true;
+    
+    // Asegurarse de que el valor sea una cadena para la comparación
+    const providerId = String(payment.providerId);
+    
+    // Verificar si ya existe un elemento de visualización
+    if (!providerSelect._displayElement) {
+        // Crear un elemento para mostrar el nombre del proveedor
+        const providerDisplay = document.createElement('div');
+        providerDisplay.className = 'form-control disabled';
+        providerDisplay.style.backgroundColor = '#f8f9fa';
+        providerDisplay.style.cursor = 'not-allowed';
+        
+        // Buscar el nombre del proveedor
+        const provider = providers.find(p => String(p.id) === providerId);
+        providerDisplay.textContent = provider ? provider.name : 'Proveedor no encontrado';
+        
+        // Insertar el display después del select y ocultar el select
+        providerSelect.parentNode.insertBefore(providerDisplay, providerSelect.nextSibling);
+        providerSelect.style.display = 'none';
+        
+        // Guardar referencia al elemento display para poder limpiarlo después
+        providerSelect._displayElement = providerDisplay;
+    } else {
+        // Si ya existe, solo actualizar el texto
+        const provider = providers.find(p => String(p.id) === providerId);
+        providerSelect._displayElement.textContent = provider ? provider.name : 'Proveedor no encontrado';
+        providerSelect.style.display = 'none';
+        providerSelect._displayElement.style.display = 'block';
+    }
+    document.getElementById('payment-amount').value = payment.amount;
+    document.getElementById('payment-concept').value = payment.concept;
+    document.getElementById('payment-date').value = payment.date;
+    
+    // Cambiar el título del modal
+    document.querySelector('#new-payment-modal .modal-header h2').textContent = 'Editar Pago';
+    
+    // Agregar clase para estilo visual cuando está deshabilitado
+    providerSelect.classList.add('disabled');
+    
+    // Agregar un campo oculto para el ID del pago
+    let paymentIdInput = document.getElementById('payment-id');
+    if (!paymentIdInput) {
+        paymentIdInput = document.createElement('input');
+        paymentIdInput.type = 'hidden';
+        paymentIdInput.id = 'payment-id';
+        document.getElementById('new-payment-form').appendChild(paymentIdInput);
+    }
+    paymentIdInput.value = paymentId;
+    
+    // Mostrar el modal
+    showNewPaymentModal();
+}
+
+// Función para ver detalles del pago (mantenida por compatibilidad)
+function viewPaymentDetails(paymentId) {
+    editPayment(paymentId); // Redirigir a la función de edición
+}
+
+// Variables para el modal de confirmación
+let currentPaymentToDelete = null;
+let currentDeleteButton = null;
+
+// Función para abrir el modal de confirmación
+function openDeleteConfirmation(paymentId, button) {
+    currentPaymentToDelete = paymentId;
+    currentDeleteButton = button;
+    
+    const modal = document.getElementById('confirm-delete-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Agregar la clase show después de un pequeño retraso para la animación
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
     }
 }
 
-// Función para imprimir recibo
-function printReceipt(paymentId) {
-    // Implementar lógica de impresión
-    alert(`Generando recibo para el pago #${paymentId}...`);
+// Función para cerrar el modal de confirmación
+function closeDeleteConfirmation() {
+    const modal = document.getElementById('confirm-delete-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        
+        // Esperar a que termine la animación antes de ocultar
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentPaymentToDelete = null;
+            currentDeleteButton = null;
+        }, 300);
+    }
+}
+
+// Función para confirmar la eliminación
+function confirmDelete() {
+    if (currentPaymentToDelete === null || !currentDeleteButton) return;
+    
+    // Encontrar el índice del pago
+    const paymentIndex = payments.findIndex(p => p.id === currentPaymentToDelete);
+    
+    if (paymentIndex === -1) {
+        showNotification('No se pudo encontrar el pago a eliminar', 'error');
+        closeDeleteConfirmation();
+        return;
+    }
+    
+    // Eliminar el pago del array
+    payments.splice(paymentIndex, 1);
+    
+    // Actualizar localStorage
+    localStorage.setItem('payments', JSON.stringify(payments));
+    
+    // Actualizar el ID máximo si es necesario
+    if (currentPaymentToDelete === nextPaymentId - 1) {
+        nextPaymentId--;
+    }
+    
+    // Cerrar el modal
+    closeDeleteConfirmation();
+    
+    // Eliminar la fila de la tabla
+    const row = currentDeleteButton.closest('tr');
+    if (row) {
+        row.style.opacity = '0';
+        setTimeout(() => {
+            row.remove();
+            updateSummary();
+            showNotification('Pago eliminado correctamente', 'success');
+        }, 300);
+    } else {
+        // Si no se puede eliminar la fila directamente, recargar la tabla
+        renderPaymentsTable();
+        updateSummary();
+        showNotification('Pago eliminado correctamente', 'success');
+    }
+}
+
+// Inicializar eventos del modal de confirmación
+document.addEventListener('DOMContentLoaded', () => {
+    // Botón de confirmar eliminación
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', confirmDelete);
+    }
+    
+    // Botón de cancelar eliminación
+    const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+    if (cancelDeleteBtn) {
+        cancelDeleteBtn.addEventListener('click', closeDeleteConfirmation);
+    }
+    
+    // Botón de cerrar (x)
+    const closeDeleteModal = document.getElementById('close-delete-modal');
+    if (closeDeleteModal) {
+        closeDeleteModal.addEventListener('click', closeDeleteConfirmation);
+    }
+    
+    // Cerrar al hacer clic fuera del contenido del modal
+    const deleteModal = document.getElementById('confirm-delete-modal');
+    if (deleteModal) {
+        deleteModal.addEventListener('click', (e) => {
+            if (e.target === deleteModal) {
+                closeDeleteConfirmation();
+            }
+        });
+    }
+});
+
+// Función para eliminar un pago (mantenida por compatibilidad)
+function deletePayment(paymentId, button) {
+    openDeleteConfirmation(paymentId, button);
 }
 
 // Función para exportar a PDF

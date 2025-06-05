@@ -1,7 +1,7 @@
 /* Estilos específicos para el módulo de pagos */
 
-/* Estilos para el modal */
-.modal {
+/* Estilos para el modal de nuevo pago */
+#new-payment-modal {
     display: none;
     position: fixed;
     z-index: 1000;
@@ -15,23 +15,29 @@
     transition: opacity 0.3s ease;
 }
 
-.modal.show {
-    display: flex;
+#new-payment-modal.show {
+    display: flex !important;
     justify-content: center;
     align-items: center;
     opacity: 1;
 }
 
-.modal-content {
-    background-color: #fff;
+.payments-table {
+    padding: 0px;
+}
+
+#new-payment-modal .modal-content {
+    max-width: 500px;
+    margin: 10% auto;
+    padding: 0px;
     border-radius: 8px;
-    width: 90%;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+    position: relative;
+    overflow-y: auto;
+    width: 90%;
     animation: modalFadeIn 0.3s ease-out;
+    height: 90vh;
 }
 
 @keyframes modalFadeIn {
@@ -43,6 +49,121 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Estilos para el modal de confirmación de eliminación */
+#confirm-delete-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1050;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#confirm-delete-modal.show {
+    display: flex;
+    opacity: 1;
+}
+
+#confirm-delete-modal .modal-content {
+    max-width: 500px;
+    width: 90%;
+    height: 462;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    transform: translateY(20px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    text-align: center;
+}
+
+#confirm-delete-modal.show .modal-content {
+    transform: translateY(0);
+}
+
+#confirm-delete-modal .warning-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        background-color: #fff5f5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #ffc9c9;
+    }
+
+#confirm-delete-modal .warning-icon i {
+    font-size: 40px;
+    color: #ff4444;
+}
+
+#confirm-delete-modal h3 {
+    margin: 15px 0;
+    color: #2d3748;
+    font-size: 1.5rem;
+    font-weight: 600;
+    padding: 0 20px;
+}
+
+#confirm-delete-modal p {
+    color: #4a5568;
+    margin: 0 0 30px;
+    padding: 0 25px;
+    line-height: 1.5;
+    font-size: 1rem;
+}
+
+#confirm-delete-modal .modal-footer {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px 25px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    border-radius: 0 0 12px 12px;
+}
+
+#confirm-delete-modal .btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+#confirm-delete-modal .btn-secondary {
+    color: #fff;
+    background-color: red;
+    border-color: red;
+}
+
+#confirm-delete-modal .btn-secondary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+#confirm-delete-modal .btn-danger {
+    background-color: #3BC86E;
+    border-color: #3BC86E;
+    color: white;
+    border: none;
+}
+
+#confirm-delete-modal .btn-danger:hover {
+    background-color: #2ea55d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 200, 110, 0.2);
 }
 
 .modal-header {
@@ -75,9 +196,7 @@
     color: #495057;
 }
 
-.modal-body {
-    padding: 20px;
-}
+
 
 /* Estilos para el formulario */
 .form-group {
@@ -110,6 +229,14 @@
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
+/* Estilo para select deshabilitado */
+#new-payment-modal .form-control:disabled,
+#new-payment-modal .form-control.disabled {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+    opacity: 1;
+}
+
 /* Estilos para los botones del formulario */
 .form-actions {
     display: flex;
@@ -122,18 +249,20 @@
 
 .btn {
     display: inline-block;
-    font-weight: 500;
     text-align: center;
     white-space: nowrap;
     vertical-align: middle;
     user-select: none;
     border: 1px solid transparent;
-    padding: 8px 16px;
-    font-size: 1rem;
+    padding: 5px 10px;
+    font-size: 12px;
     line-height: 1.5;
     border-radius: 4px;
     transition: all 0.2s ease-in-out;
     cursor: pointer;
+}
+.btn.btn-info {
+    background-color: orange;
 }
 
 .btn-primary {
@@ -163,6 +292,17 @@
     color: #dc3545;
 }
 
+/* Ocultar controles de incremento/decremento en inputs de tipo number */
+#new-payment-modal input[type="number"]::-webkit-outer-spin-button,
+#new-payment-modal input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#new-payment-modal input[type="number"] {
+    -moz-appearance: textfield;
+}
+
 /* Estilos responsivos */
 @media (max-width: 768px) {
     .modal-content {
@@ -178,3 +318,9 @@
         width: 100%;
     }
 }
+
+.modal-body {
+    padding: 0px;
+    margin: 0px;
+}
+

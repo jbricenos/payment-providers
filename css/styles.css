@@ -674,10 +674,27 @@ textarea.error {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+    /* Estilos responsivos */
+@media (max-width: 768px) {
     .modal-content {
         width: 95%;
-        padding: 20px 15px;
+        margin: 20px auto;
     }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
+
+.modal-body {
+    padding: 0px;
+    margin: 0px;
+}
+
 }
 
 /* Estilos para notificaciones */
