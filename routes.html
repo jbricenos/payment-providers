@@ -4,10 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rutas y Horarios - Costa Transportes</title>
+    <title>Rutas y Análisis - Costa Transportes</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
     <link rel="stylesheet" href="css/table.css">
+    <link rel="stylesheet" href="css/analytics.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 
 <body>
@@ -19,6 +21,12 @@
                     <img src="css/logo.jpg" alt="Costa Transportes" class="logo-img">
                 </div>
             </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#tabla-rutas" class="active"><i class="ti-view-list-alt"></i> Tabla de Rutas</a></li>
+                    <li><a href="#analiticas"><i class="ti-bar-chart"></i> Análisis</a></li>
+                </ul>
+            </nav>
             <nav class="nav-menu">
                 <a href="index.html" class="nav-link" data-tab="providers">
                     <i class="ti-home sidemenu-icon menu-icon"></i>
@@ -41,8 +49,141 @@
                 <h1>Rutas</h1>
             </div>
 
-<div class="providersTable">
-            <table  id="proveedoresTable">
+<!-- Sección de Análisis -->
+<div id="analiticas" class="tab-content" style="display: none;">
+    <div class="analytics-container">
+        <div class="analytics-header">
+            <h1>📊 Dashboard de Métricas</h1>
+            <p>Costa Transportes - Análisis de Rendimiento</p>
+        </div>
+
+        <!-- Tarjetas de estadísticas -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalRevenue">$12,520,000</div>
+                <div class="stat-label">Recaudación Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalCommission">$2,504,000</div>
+                <div class="stat-label">Comisión Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="netPayment">$10,016,000</div>
+                <div class="stat-label">Pago Neto Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgOccupancy">53%</div>
+                <div class="stat-label">Ocupación Promedio</div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterData('all')">Todos</button>
+            <button class="filter-btn" onclick="filterData('tacoha')">Tacoha</button>
+            <button class="filter-btn" onclick="filterData('traveltur')">Traveltur</button>
+        </div>
+
+        <!-- Tarjetas de proveedores -->
+        <div class="provider-cards">
+            <div class="provider-card tacoha">
+                <div class="provider-name">🚌 Tacoha</div>
+                <div class="provider-info">
+                    <div class="info-item">
+                        <span class="info-label">Representante:</span>
+                        <span class="info-value">Jorge Martinez</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Comisión:</span>
+                        <span class="info-value">20%</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Rutas:</span>
+                        <span class="info-value">3</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Estado:</span>
+                        <span class="info-value" style="color: #28a745;">✅ Aprobado</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="provider-card traveltur">
+                <div class="provider-name">🚐 Traveltur</div>
+                <div class="provider-info">
+                    <div class="info-item">
+                        <span class="info-label">Representante:</span>
+                        <span class="info-value">Rodrigo Muñoz</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Comisión:</span>
+                        <span class="info-value">15%</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Rutas:</span>
+                        <span class="info-value">3</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Estado:</span>
+                        <span class="info-value" style="color: #007bff;">⏳ Pendiente</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="charts-grid">
+            <div class="chart-container">
+                <div class="chart-title">💰 Distribución de Ingresos por Proveedor</div>
+                <canvas id="revenueChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">📊 Comparación de Comisiones</div>
+                <canvas id="commissionChart"></canvas>
+            </div>
+            
+            <div class="chart-container full-width-chart">
+                <div class="chart-title">📈 Análisis de Rendimiento por Ruta</div>
+                <canvas id="routePerformanceChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">🎯 Ocupación por Proveedor</div>
+                <canvas id="occupancyChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">💳 Pagos Netos Comparativos</div>
+                <canvas id="netPaymentChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Análisis de rutas -->
+        <div class="route-analysis">
+            <div class="chart-title">🗺️ Análisis Detallado de Rutas</div>
+            <table class="route-table">
+                <thead>
+                    <tr>
+                        <th>Ruta</th>
+                        <th>Proveedor</th>
+                        <th>Recaudación</th>
+                        <th>Ocupación</th>
+                        <th>Eficiencia</th>
+                        <th>Pago Neto</th>
+                    </tr>
+                </thead>
+                <tbody id="routeTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Sección de Tabla de Rutas -->
+<div id="tabla-rutas" class="tab-content">
+    <div class="providersTable">
+        <table id="proveedoresTable">
                 <thead>
                     <tr>
                         <th class="col-a">#</th>
@@ -241,8 +382,47 @@
             </table>
         </div>
     </div>
-        <script>
-            // Funcionalidad para agregar interactividad
+    
+    <!-- Script para el cambio de pestañas -->
+    <script>
+        // Funcionalidad para cambiar entre pestañas
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mostrar la pestaña activa por defecto
+            showTab('tabla-rutas');
+            
+            // Agregar manejadores de eventos a los enlaces del menú
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const tabId = this.getAttribute('href').substring(1);
+                    showTab(tabId);
+                    
+                    // Actualizar la clase activa en los enlaces del menú
+                    document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+        
+        function showTab(tabId) {
+            // Ocultar todos los contenidos de pestañas
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Mostrar la pestaña seleccionada
+            const activeTab = document.getElementById(tabId);
+            if (activeTab) {
+                activeTab.style.display = 'block';
+            }
+        }
+    </script>
+    
+    <!-- Incluir el archivo de análisis -->
+    <script src="js/analytics.js"></script>
+    
+    <script>
+        // Funcionalidad para agregar interactividad
             document.addEventListener('DOMContentLoaded', function () {
                 const table = document.getElementById('proveedoresTable');
 
