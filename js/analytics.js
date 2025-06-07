@@ -124,8 +124,8 @@ function createRevenueChart() {
             datasets: [{
                 data: providerRevenues,
                 backgroundColor: [
-                    'linear-gradient(135deg, #667eea, #764ba2)',
-                    'linear-gradient(135deg, #28a745, #20c997)'
+                    'rgba(102, 126, 234, 0.7)',
+                    'rgba(40, 167, 69, 0.7)'
                 ],
                 borderWidth: 0,
                 hoverOffset: 10
@@ -270,7 +270,10 @@ function createRoutePerformanceChart() {
                     position: 'top',
                     labels: {
                         usePointStyle: true,
-                        padding: 20
+                        padding: 15,
+                        font:{
+                            size: 12,
+                        }
                     }
                 }
             },
@@ -278,8 +281,11 @@ function createRoutePerformanceChart() {
                 x: {
                     display: true,
                     ticks: {
-                        maxRotation: 45,
-                        minRotation: 45
+                        maxRotation: 25,
+                        minRotation: 25,
+                        font:{
+                            size: 10,
+                        }
                     }
                 },
                 y: {
@@ -335,7 +341,11 @@ function createOccupancyChart() {
                     position: 'bottom',
                     labels: {
                         usePointStyle: true,
-                        padding: 20
+                        padding: 20,
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
                     }
                 }
             },
@@ -372,8 +382,8 @@ function createNetPaymentChart() {
                 label: 'Pago Neto',
                 data: netPayments,
                 backgroundColor: [
-                    'linear-gradient(135deg, #667eea, #764ba2)',
-                    'linear-gradient(135deg, #28a745, #20c997)'
+                    'rgba(102, 126, 234, 0.7)',
+                    'rgba(40, 167, 69, 0.7)'
                 ],
                 borderRadius: 10,
                 borderSkipped: false

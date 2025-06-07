@@ -21,12 +21,7 @@
                     <img src="css/logo.jpg" alt="Costa Transportes" class="logo-img">
                 </div>
             </div>
-            <nav class="sidebar-nav">
-                <ul>
-                    <li><a href="#tabla-rutas" class="active"><i class="ti-view-list-alt"></i> Tabla de Rutas</a></li>
-                    <li><a href="#analiticas"><i class="ti-bar-chart"></i> Análisis</a></li>
-                </ul>
-            </nav>
+            
             <nav class="nav-menu">
                 <a href="index.html" class="nav-link" data-tab="providers">
                     <i class="ti-home sidemenu-icon menu-icon"></i>
@@ -40,7 +35,14 @@
                     <i class="ti-direction-alt sidemenu-icon menu-icon"></i>
                     <span class="menu-title">Rutas</span>
                 </a>
+                <div class="sidebar-nav">
+                <a href="analitycs.html" class="nav-link" data-tab="analiticas">
+                    <i class="ti-bar-chart sidemenu-icon menu-icon"></i>
+                    <span class="menu-title">Análisis</span>
+                </a>
+                </div>
             </nav>
+            
         </div>
 
         <!-- Main Content -->
@@ -48,6 +50,7 @@
             <div class="header">
                 <h1>Rutas</h1>
             </div>
+            
 
 <!-- Sección de Análisis -->
 <div id="analiticas" class="tab-content" style="display: none;">
@@ -393,7 +396,6 @@
             // Agregar manejadores de eventos a los enlaces del menú
             document.querySelectorAll('.sidebar-nav a').forEach(link => {
                 link.addEventListener('click', function(e) {
-                    e.preventDefault();
                     const tabId = this.getAttribute('href').substring(1);
                     showTab(tabId);
                     
@@ -420,65 +422,5 @@
     
     <!-- Incluir el archivo de análisis -->
     <script src="js/analytics.js"></script>
-    
-    <script>
-        // Funcionalidad para agregar interactividad
-            document.addEventListener('DOMContentLoaded', function () {
-                const table = document.getElementById('proveedoresTable');
-
-                // Función para formatear números como moneda
-                function formatCurrency(value) {
-                    if (!value || value === '') return '';
-                    const num = parseFloat(value.replace(/[\$,]/g, ''));
-                    if (isNaN(num)) return value;
-                    return '$' + num.toLocaleString('es-CL');
-                }
-
-                // Función para formatear números
-                function formatNumber(value) {
-                    if (!value || value === '') return '';
-                    const num = parseFloat(value.replace(/[,]/g, ''));
-                    if (isNaN(num)) return value;
-                    return num.toLocaleString('es-CL');
-                }
-
-                // Agregar funcionalidad de edición en línea (opcional)
-                const editableCells = table.querySelectorAll('.currency, .numeric');
-                editableCells.forEach(cell => {
-                    cell.addEventListener('dblclick', function () {
-                        const originalText = this.textContent;
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.value = originalText;
-                        input.style.width = '100%';
-                        input.style.border = 'none';
-                        input.style.outline = 'none';
-                        input.style.background = '#fff3cd';
-
-                        this.textContent = '';
-                        this.appendChild(input);
-                        input.focus();
-
-                        function saveChanges() {
-                            const newValue = input.value;
-                            this.textContent = newValue;
-                            // Aquí puedes agregar lógica para guardar los cambios
-                            // Por ejemplo, usando fetch para enviar al servidor
-                            console.log('Nuevo valor:', newValue);
-                        }
-
-                        input.addEventListener('blur', saveChanges);
-                        input.addEventListener('keypress', function (e) {
-                            if (e.key === 'Enter') {
-                                saveChanges();
-                            } else if (e.key === 'Escape') {
-                                this.parentNode.textContent = originalText;
-                            }
-                        });
-                    });
-                });
-            });
-
-        </script>
     </body>
 </html>
