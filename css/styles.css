@@ -141,14 +141,7 @@ body {
     padding: 30px;
 }
 
-/* Pestañas */
-.tab-content {
-    display: none;
-}
 
-.tab-content.active {
-    display: block;
-}
 
 /* Tarjetas de métricas */
 .metrics-grid {

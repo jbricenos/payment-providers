@@ -1,5 +1,5 @@
 .providersTable{
-    margin-top: 200px;
+    margin-top: 100px;
     padding: 20px;
 }
        
@@ -8,16 +8,16 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 11px;
-            table-layout: fixed;
+            table-layout:auto;
         }
 
         th,
         td {
             border: 1px solid #d4d4d4;
-            padding: 4px 6px;
-            text-align: left;
+            padding: 2px 4px;
+            text-align: center;
             height: 20px;
-            vertical-align: middle;
+            vertical-align: center;
         }
 
         /* Encabezados */
@@ -65,15 +65,15 @@
         /* Estado de aprobación */
         .approval-r {
             text-align: center;
-            background-color: #d4edda;
-            color: #155724;
+            background-color: #cce5ff;
+            color: #004085;
             font-weight: bold;
         }
 
         .approval-t {
             text-align: center;
-            background-color: #cce5ff;
-            color: #004085;
+            background-color: #d4edda;
+            color: #155724;
             font-weight: bold;
         }
 
@@ -96,23 +96,23 @@
 
         /* Anchos específicos de columnas */
         .col-a {
-            width: 36px;
+            width: 22px;
         }
 
         .col-b {
-            width: 114px;
+            width: 115px;
         }
 
         .col-c {
-            width: 101px;
+            width: 111px;
         }
 
         .col-d {
-            width: 105px;
+            width: 125px;
         }
 
         .col-e {
-            width: 96px;
+            width: 68px;
         }
 
         .col-f {
@@ -120,27 +120,27 @@
         }
 
         .col-g {
-            width: 112px;
+            width: 132px;
         }
 
         .col-h {
-            width: 102px;
+            width: 86px;
         }
 
         .col-i {
-            width: 67px;
+            width: 72px;
         }
 
         .col-j {
-            width: 87px;
+            width: 88px;
         }
 
         .col-k {
-            width: 67px;
+            width: 75px;
         }
 
         .col-l {
-            width: 78px;
+            width: 90px;
         }
 
         .col-m {
@@ -175,12 +175,14 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
+            .providersTable{
+                zoom: 0.2;
+                margin-top: 200px;
+                padding: 20px;
             }
 
             table {
-                font-size: 9px;
+                font-size: 7px;
             }
 
             th,
